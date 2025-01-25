@@ -1,0 +1,122 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Byte-code files
+*.pyc
+*.pyo
+
+# Intellij IDEA Files
+.idea/
+*.iws
+*.ipr
+*.iml
+.DS_Store
+
+# Maven files
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.nextFile
+dependency-reduced-pom.xml
+*.mvn/wrapper/
+.mvn/wrapper/
+
+# Gradle files
+.gradle
+/build/
+*.gradle
+*.gradle.kts
+
+# Local configuration file
+.env
+
+# Eclipse project files
+.project
+.classpath
+.settings/
+
+# NetBeans
+/nbproject/
+
+# Temporary files created by developers
+*.swp
+*.bak
+~*
+*.tmp
+
+# Cache files
+/out/
+.cache
+
+# Logs
+hs_err_pid*
+
+# OS Specific Files
+Thumbs.db
+ehthumbs.db
+.Spotlight-V100
+.Trashes
+*.AppleDouble
+
+# Editor and IDE backups
+*~
+*.orig
+*.rej
+
+# Certificate stores
+*.jks
+*.p12
+*.keystore
+
+# Build system specific files
+/dist/
+/build/
+.factorypath
+.settings
+/.externalToolBuilders/
+
+# Temporary files often created by operating systems
+._*
+.DS_Store
+.LSOverride
+
+# Distribution archives
+*.zip
+*.tar
+*.gz
+
+# Environment variable files
+.env
+*.env
+
+# JetBrains Rider
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf
+.idea/compiler.xml
+.idea/vcs.xml
+.idea/runConfigurations.xml
+*.iml
+
+# Local history for IntelliJ
+.localHistory/
+
+# Gradle build scans
+.gradle-build-scan/
+
+# Avoid committing sensitive data
+id_rsa
+id_rsa.pub
+*.pem
+*.key
