@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,8 +19,8 @@ import java.util.List;
 @RestController
 public class ClientController {
 
-    String NIO_URL = "http://localhost:8080/server/nio";
-    String BIO_URL = "http://localhost:8080/server/bio";
+    String NIO_URL = "http://localhost:8081/server/nio";
+    String BIO_URL = "http://localhost:8081/server/bio";
     WebClient webClient = WebClient.create();
 
     @GetMapping("bio")
@@ -29,15 +30,17 @@ public class ClientController {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<>() {
                 });
-//                .exchangeToMono(response -> {
-//                    return response.bodyToMono(new ParameterizedTypeReference<List<String>>() {});
-//                });
-        List<String> data1 = retreivedMono.block();
-        log.info("Client - Netty collected (blocked) {}", data1);
 
+        // i) using block
+        List<String> dataList = retreivedMono.block();
+        // the following is printed only after dataList is available
+        log.info("i) Client - Netty collected (blocked) {}", dataList);
+
+        // ii) using subscribe
         retreivedMono.subscribe(data -> {
-            log.info("Client - Netty collected {}", data);
+            log.info("ii) Client - Netty collected {}", data);
         });
+
         return "Check the client logs for 'Client - Netty collected'";
     }
 
@@ -49,10 +52,13 @@ public class ClientController {
                 .exchangeToFlux(response -> {
                     return response.bodyToFlux(String.class);
                 });
-        updatedFlux.log().buffer(1).subscribe(data -> {
+//        updatedFlux.log().buffer(1).subscribe(data -> {
+//            log.info("Client - Netty collected {}", data);
+//        });
+
+        updatedFlux.subscribe(data -> {
             log.info("Client - Netty collected {}", data);
         });
-
         return "Check the client logs for 'Client - Netty collected'";
     }
 

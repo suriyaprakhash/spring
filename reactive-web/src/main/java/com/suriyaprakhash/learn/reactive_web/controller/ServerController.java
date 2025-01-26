@@ -22,19 +22,23 @@ public class ServerController {
 
     private final List<String> stringList = List.of(new String[]{"one", "two", "three", "four", "five", "six"});
 
+
+    @GetMapping(value = "bio", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<String> getBio() {
+        List<String> updatedList = listService.getListBio();
+        // the following is printed only after updateList is fully available
+        log.info("Server Ctrl - Tomcat collected {}", updatedList);
+        return updatedList;
+    }
+
     @GetMapping(value = "nio", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> getNio() {
         Flux<String> updatedFlux = listService.getListNio();
-        log.info("Server - Netty collected {}", updatedFlux.count());
+        log.info("Server Ctrl - Netty collected {}", updatedFlux.count());
 //        return updatedFlux.delayElements(Duration.ofSeconds(1));
         return updatedFlux;
     }
 
 
-    @GetMapping(value = "bio", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<String> getBio() {
-        List<String> updatedList = listService.getListBio();
-        log.info("Server - Tomcat collected {}", updatedList);
-        return updatedList;
-    }
+
 }
