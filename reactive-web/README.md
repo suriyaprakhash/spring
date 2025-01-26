@@ -1,3 +1,23 @@
+# Demystifying Blocking vs. Non-Blocking Web Requests
+
+This corresponds to the medium post [here](https://medium.com/p/ef95ca9f02b7/edit)
+
+## How to test
+
+- The project has client and server controller
+- Run the client at 8080 and server at 8081
+- Make the browser call to the client APIs - which inturn calls the server API
+- Comment the desired Web container (tomcat/netty) based on your testing to test the __bio__ and __nio__
+
+## TODO: Enhancement from here
+
+- Test file disk read and write
+- Test security configuration
+- Update the docker compose - and use watcher
+
+
+## OLD MISC
+
 ### Tested
 
 - If you remove **spring-boot-starter-web** from pom (ie. tomcat) and just have **webflux netty** _client/bio_ calls fail throwing
@@ -16,8 +36,3 @@ java.lang.IllegalStateException: block()/blockFirst()/blockLast() are blocking, 
 - Investigate on how non-blocking works in netty even though it feels like a blocking call (EVENT LOOP)
 
 
-### Tomcat vs Netty
-
-- **spring-boot-starter-web** brings tomcat
-- **spring-boot-starter-webflux** brings netty
-- Spring is intelligent enough to determine which calls needs to be routed to netty and which needs to be routed to 
