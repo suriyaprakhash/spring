@@ -1,4 +1,4 @@
-package com.suriyaprakhash.learn.reactive_web.controller;
+package com.suriyaprakhash.learn.reactive_web.biovsnio.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;

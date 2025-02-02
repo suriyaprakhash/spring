@@ -2,7 +2,10 @@ spring:
   application:
     name: cache-web
   datasource:
-    url: jdbc:postgresql://postgresdb:5432/postgres
+    # This is referring to the docker hostname
+    #url: jdbc:postgresql://postgresdb:5432/postgres
+    # Use the following when running in local
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: test
   jpa:

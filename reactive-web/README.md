@@ -2,6 +2,14 @@
 
 This corresponds to the medium post [here](https://medium.com/p/ef95ca9f02b7/edit)
 
+## Run
+
+Run the following for JFR
+```
+-Dserver.port=8081
+-XX:StartFlightRecording=duration=200s,filename=flight.jfr
+```
+
 ## How to test
 
 - The project has client and server controller
