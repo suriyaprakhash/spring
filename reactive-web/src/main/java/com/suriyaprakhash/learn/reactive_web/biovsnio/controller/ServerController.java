@@ -33,8 +33,6 @@ public class ServerController {
 
     private final List<String> stringList = List.of(new String[]{"one", "two", "three", "four", "five", "six"});
 
-
-
     @GetMapping(value = "bio", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> getBio() {
         List<String> updatedList = listService.getListBio();
