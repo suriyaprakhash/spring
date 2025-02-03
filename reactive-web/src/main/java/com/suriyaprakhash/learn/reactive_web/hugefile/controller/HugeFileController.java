@@ -16,11 +16,12 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import reactor.core.publisher.Flux;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequestMapping("/hugefile")
@@ -28,29 +29,44 @@ import java.util.stream.Collectors;
 @RestController
 public class HugeFileController {
 
+    /**
+     * This does not work with just reactor Netty - since HttpServletResponse is from tomcat
+     *
+     * THIS IS NOT RECOMMENDED as it by passes the spring boot's abstraction
+     *
+     * @param httpServletResponse
+     * @throws IOException
+     */
     @GetMapping(value="bio/read-all")
     public void getHugeFileReadAll(HttpServletResponse httpServletResponse) throws IOException {
-        Path filePath = Paths.get("/home/suriya/sample-test-files/1G.pdf");
+        Path filePath = Paths.get("/home/suriya/sample-test-files/150MB.csv");
         byte[] bytes = Files.readAllBytes(filePath);
-        httpServletResponse.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=1G.pdf");
+        httpServletResponse.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=150MB.csv");
         for (byte aByte : bytes) {
             httpServletResponse.getWriter().write(aByte);
         }
         log.info("Download completed");
     }
 
-
+    /**
+     * This does not work with just reactor Netty - since HttpServletResponse is from tomcat
+     *
+     * THIS IS NOT RECOMMENDED as it by passes the spring boot's abstraction
+     *
+     * @param httpServletResponse
+     * @throws IOException
+     */
     @GetMapping(value="bio/buffered")
     public void getHugeFileBio1(HttpServletResponse httpServletResponse) throws IOException {
-        int bufferByteSize = 1024; // Adjust buffer size as needed
+        int bufferByteSize = 102; // Adjust buffer size as needed
         int bytesRead; // keeps track of no.of byte filled in the buffer
-        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/1G.pdf"), bufferByteSize)) {
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
             byte[] buffer = new byte[bufferByteSize];
             while ((bytesRead = bis.read(buffer)) != -1) {
                 // Process the bytes in the buffer
                 for (int i = 0; i < bytesRead; i++) {
                     httpServletResponse.getWriter().write(buffer[i]);
-                    httpServletResponse.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=1G.pdf");
+                    httpServletResponse.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=150MB.csv");
                 }
             }
         }
@@ -61,7 +77,7 @@ public class HugeFileController {
     public ResponseEntity<Resource> getHugeFileBio2() throws IOException {
 
         try {
-            Path filePath = Paths.get("/home/suriya/sample-test-files/").resolve("1G.pdf").normalize();
+            Path filePath = Paths.get("/home/suriya/sample-test-files/").resolve("150MB.csv").normalize();
             Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return ResponseEntity.ok().body(resource);
@@ -74,23 +90,23 @@ public class HugeFileController {
     }
 
     /**
-     * Even though this is web servlet - it uses async task executor to work on the rest of the stream closing the main thread
-     *
-     * That is why you would see a portion of the download size in the networks tab - however the whole file downloads sequentially
+     * Even though this is web servlet - it uses async task executor to work on the rest of the stream closing the main thread.
+     * So spring.mvc.async.request-timeout - matters by default its set to 30 sec
+     * Transfer-Encoding: chunked - response header is set so content length doesn't matter
      *
      * @return
      * @throws IOException
      */
     @GetMapping(value="bio/stream")
     public ResponseEntity<StreamingResponseBody> getHugeFileBioStream() throws IOException {
-//        DeferredResult<StreamingResponseBody> deferredResult = new DeferredResult<>(10000L);
+//       DeferredResult<ResponseEntity<StreamingResponseBody>> deferredResult = new DeferredResult<>(10000L);
         HttpHeaders headers = new HttpHeaders();
 //        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDisposition(ContentDisposition.attachment().filename("huge-file-download.pdf").build());
+        headers.setContentDisposition(ContentDisposition.attachment().filename("stream.csv").build());
 
         StreamingResponseBody stream = outputStream -> {
             int byteRead;
-            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/1G.pdf"), 8192)) {
+            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), 8192)) {
                 while ((byteRead = bis.read()) != -1) {
                     outputStream.write(byteRead);
                 }

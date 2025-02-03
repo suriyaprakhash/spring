@@ -10,6 +10,20 @@ Run the following for JFR
 -XX:StartFlightRecording=duration=200s,filename=flight.jfr
 ```
 
+## Load with K6 or ab
+
+Make sure k6 is installed (WSL) 
+
+**Note:** this runs only when java from WSL is used - you could not profile in IDEA since it does not see WSL java 
+
+```
+k6 run src/test/js/load.js
+```
+
+```
+ab http://localhost:8081/hugefile/bio/stream
+```
+
 ## How to test
 
 - The project has client and server controller
