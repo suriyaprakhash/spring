@@ -58,10 +58,10 @@ public class HugeFileController {
      */
     @GetMapping(value="bio/buffered")
     public void getHugeFileBio1(HttpServletResponse httpServletResponse) throws IOException {
-        int bufferByteSize = 102; // Adjust buffer size as needed
+        int bufferByteSize = 1024; // Adjust buffer size as needed
         int bytesRead; // keeps track of no.of byte filled in the buffer
+        byte[] buffer = new byte[bufferByteSize];
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
-            byte[] buffer = new byte[bufferByteSize];
             while ((bytesRead = bis.read(buffer)) != -1) {
                 // Process the bytes in the buffer
                 for (int i = 0; i < bytesRead; i++) {
@@ -100,15 +100,32 @@ public class HugeFileController {
     @GetMapping(value="bio/stream")
     public ResponseEntity<StreamingResponseBody> getHugeFileBioStream() throws IOException {
 //       DeferredResult<ResponseEntity<StreamingResponseBody>> deferredResult = new DeferredResult<>(10000L);
+
+        int bufferByteSize = 8192; // Adjust buffer size as needed - default 8192
+
         HttpHeaders headers = new HttpHeaders();
 //        headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDisposition(ContentDisposition.attachment().filename("stream.csv").build());
 
         StreamingResponseBody stream = outputStream -> {
-            int byteRead;
-            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), 8192)) {
-                while ((byteRead = bis.read()) != -1) {
-                    outputStream.write(byteRead);
+
+//            int byteRead;
+//            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
+//                // gets only one byte so does more read from the stream
+//                while ((byteRead = bis.read()) != -1) {
+//                    outputStream.write(byteRead);
+//                }
+//            }
+
+            int bytesRead; // keeps track of no.of byte filled in the buffer
+            byte[] buffer = new byte[bufferByteSize];
+            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
+                // reads the buffer into the array
+                while ((bytesRead = bis.read(buffer)) != -1) {
+                    // Process the bytes in the buffer
+                    for (int i = 0; i < bytesRead; i++) {
+                        outputStream.write(buffer[i]);
+                    }
                 }
             }
         };
