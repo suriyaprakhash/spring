@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RequestMapping("/hugefile")
@@ -130,6 +131,40 @@ public class HugeFileController {
             }
         };
         return ResponseEntity.ok().headers(headers).body(stream);
+    }
+
+
+    @GetMapping("bio/stream/deferred")
+    public DeferredResult<ResponseEntity<StreamingResponseBody>> stream() {
+        DeferredResult<ResponseEntity<StreamingResponseBody>> deferredResult = new DeferredResult<>(5000L); // 5 seconds timeout
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                StreamingResponseBody responseBody = outputStream -> {
+                    // Simulate streaming data
+                    for (int i = 0; i < 20; i++) {
+                        outputStream.write(("Data " + i + "\n").getBytes());
+                        outputStream.flush();
+//                        try {
+//                            Thread.sleep(500); // Simulate some processing delay
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
+                    }
+                };
+
+                deferredResult.setResult(ResponseEntity.ok(responseBody));
+
+            } catch (Exception e) {
+                deferredResult.setErrorResult(ResponseEntity.internalServerError().build()); // Handle errors
+            }
+        });
+
+        deferredResult.onTimeout(() -> {
+            deferredResult.setErrorResult(ResponseEntity.status(408).build()); // Request Timeout
+        });
+
+        return deferredResult;
     }
 
     @GetMapping(value="nio", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
