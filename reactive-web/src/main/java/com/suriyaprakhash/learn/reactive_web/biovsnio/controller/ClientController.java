@@ -62,5 +62,4 @@ public class ClientController {
         return "Check the client logs for 'Client - Netty collected'";
     }
 
-
 }
