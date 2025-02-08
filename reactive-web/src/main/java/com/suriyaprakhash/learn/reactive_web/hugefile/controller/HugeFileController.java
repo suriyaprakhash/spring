@@ -37,7 +37,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @RequestMapping("/hugefile")
-
 @RestController
 public class HugeFileController {
 
@@ -123,7 +122,7 @@ public class HugeFileController {
      * @throws IOException
      */
     @GetMapping(value="bio/stream")
-    public ResponseEntity<StreamingResponseBody> getHugeFileBioStream() throws IOException {
+    public ResponseEntity<StreamingResponseBody> getHugeFileBioStream()  {
 //       DeferredResult<ResponseEntity<StreamingResponseBody>> deferredResult = new DeferredResult<>(10000L);
 
         int bufferByteSize = 8192; // Adjust buffer size as needed - default 8192
@@ -134,25 +133,28 @@ public class HugeFileController {
 
         StreamingResponseBody stream = outputStream -> {
 
-//            int byteRead;
-//            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
-//                // gets only one byte so does more read from the stream
-//                while ((byteRead = bis.read()) != -1) {
-//                    outputStream.write(byteRead);
-//                }
-//            }
-
-            int bytesRead; // keeps track of no.of byte filled in the buffer
-            byte[] buffer = new byte[bufferByteSize];
+            int byteRead;
             try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
-                // reads the buffer into the array
-                while ((bytesRead = bis.read(buffer)) != -1) {
-                    // Process the bytes in the buffer
-                    for (int i = 0; i < bytesRead; i++) {
-                        outputStream.write(buffer[i]);
-                    }
+                // gets only one byte so does more read from the stream
+                while ((byteRead = bis.read()) != -1) {
+                    outputStream.write(byteRead);
                 }
+                outputStream.flush();
+                outputStream.close();
             }
+
+//            int bytesRead; // keeps track of no.of byte filled in the buffer
+//            byte[] buffer = new byte[bufferByteSize];
+//            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
+//                // reads the buffer into the array
+//                while ((bytesRead = bis.read(buffer)) != -1) {
+//                    // Process the bytes in the buffer
+//                    for (int i = 0; i < bytesRead; i++) {
+//                        outputStream.write(buffer[i]);
+//                    }
+//                }
+ //           outputStream.flush();
+//            }
         };
         return ResponseEntity.ok().headers(headers).body(stream);
     }
@@ -235,7 +237,7 @@ public class HugeFileController {
         for (int i = 0; i < 20; i++) {
             Future<Pair<String, Integer>> future = executor.submit(new NamedTask(i, globalCounter));
 //            globalCounter++;
-            System.out.println(future.get());
+            log.info(String.valueOf(future.get()));
             futureList.add(future);
         }
 
@@ -276,6 +278,7 @@ public class HugeFileController {
         StreamingResponseBody stream = outputStream -> {
             Path nioPath = Paths.get(filePath);
             ByteBuffer byteBuffer = ByteBuffer.allocate(bufferByteSize);
+            // represents connection to the network
             try (FileChannel fileChannel = FileChannel.open(nioPath, StandardOpenOption.READ)) {
                 int bytesRead;
                 while ((bytesRead = fileChannel.read(byteBuffer)) != -1) {
@@ -290,6 +293,8 @@ public class HugeFileController {
                         byteBuffer.clear();      // Prepare buffer for next read
                     }
                 }
+                outputStream.flush();
+                outputStream.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -310,13 +315,14 @@ public class HugeFileController {
         int bufferByteSize = 8192; // Adjust buffer size as needed
         String filePath = "/home/suriya/sample-test-files/150MB.csv";
         try {
+            // represents connection to the network
             AsynchronousFileChannel channel = AsynchronousFileChannel.open(Paths.get(filePath), StandardOpenOption.READ); // Use AsynchronousFileChannel
             DefaultDataBufferFactory dataBufferFactory = new DefaultDataBufferFactory();
 
             Flux<DataBuffer> dataBufferFlux =  Flux.create(sink -> {
                 ByteBuffer byteBuffer = ByteBuffer.allocate(bufferByteSize); // Adjust byteBuffer size
                 AtomicLong position = new AtomicLong(0);
-
+                // processes incoming and outgoing data
                 java.nio.channels.CompletionHandler<Integer, Void> handler = new java.nio.channels.CompletionHandler<Integer, Void>() {
                     @Override
                     public void completed(Integer result, Void attachment) {
