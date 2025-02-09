@@ -139,9 +139,9 @@ public class HugeFileController {
                 while ((byteRead = bis.read()) != -1) {
                     outputStream.write(byteRead);
                 }
-                outputStream.flush();
-                outputStream.close();
             }
+            outputStream.flush();
+            outputStream.close();
 
 //            int bytesRead; // keeps track of no.of byte filled in the buffer
 //            byte[] buffer = new byte[bufferByteSize];

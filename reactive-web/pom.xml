@@ -28,6 +28,9 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+
+        <gatling.version>3.13.3</gatling.version>
+        <gatling-maven-plugin.version>4.13.0</gatling-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -43,10 +46,10 @@
         </dependency>
 
         <!-- for nio reactor netty web -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-webflux</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
 
         <!-- for bio tomcat web -->
         <dependency>
@@ -67,6 +70,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <version>${gatling.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -95,7 +105,17 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+
+            <plugin>
+                <groupId>io.gatling</groupId>
+                <artifactId>gatling-maven-plugin</artifactId>
+                <version>${gatling-maven-plugin.version}</version>
+                <configuration>
+                    <!-- Enterprise Cloud (https://cloud.gatling.io/) configuration reference: https://docs.gatling.io/reference/integrations/build-tools/maven-plugin/#running-your-simulations-on-gatling-enterprise-cloud -->
+                </configuration>
+            </plugin>
+
+       </plugins>
     </build>
 
 </project>
