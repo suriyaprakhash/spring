@@ -53,10 +53,10 @@
         </dependency>
 
         <!-- for bio tomcat web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-web</artifactId>-->
+<!--        </dependency>-->
 
         <!-- This is part of spring-boot-starter-webflux, however to test just the tomcat against the nio call use this for webclient, flux classes -->
         <!-- This does not bring the reactor netty server - can be commented while using starter-webflux -->
@@ -74,6 +74,14 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <version>${gatling.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
         <!-- This is for gatling tests -->
         <dependency>
             <groupId>io.gatling</groupId>
@@ -85,7 +93,9 @@
 
     </dependencies>
 
+
     <build>
+        <finalName>${project.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -115,7 +125,7 @@
                 <artifactId>gatling-maven-plugin</artifactId>
                 <version>${gatling-maven-plugin.version}</version>
                 <configuration>
-                    <simulation>com.suriyaprakhash.learn.reactive_web.simulation.HugeFileSimulation</simulation>
+                    <simulationClass>com.suriyaprakhash.learn.reactive_web.simulation.HugeFileNio</simulationClass>
                 </configuration>
             </plugin>
 

@@ -36,58 +36,14 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HugeFileController {
 
 
-    String filePath = "/hugefile";
-    String fileName = "hugefile";
-    String fileExtension = ".hugefile";
+    String filePath = "ignore-test-files/";
+    String fileName = "150MB";
+    String fileExtension = "csv";
     int bufferByteSize = 8192; // Adjust buffer size as needed
 
     // private String filePath = "\"/home/suriya/sample-test-files/\"";
     // private String fileName = "150MB";
     // private String fileType = "csv";
-
-//    /**
-//     * This does not work with just reactor Netty - since HttpServletResponse is from tomcat
-//     *
-//     * THIS IS NOT RECOMMENDED as it by passes the spring boot's abstraction
-//     *
-//     * @param httpServletResponse
-//     * @throws IOException
-//     */
-//    @GetMapping(value="bio/read-all")
-//    public void getHugeFileReadAll(HttpServletResponse httpServletResponse) throws IOException {
-//        Path filePath = Paths.get("/home/suriya/sample-test-files/150MB.csv");
-//        byte[] bytes = Files.readAllBytes(filePath);
-//        httpServletResponse.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=150MB.csv");
-//        for (byte aByte : bytes) {
-//            httpServletResponse.getWriter().write(aByte);
-//        }
-//        log.info("Download completed");
-//    }
-//
-//    /**
-//     * This does not work with just reactor Netty - since HttpServletResponse is from tomcat
-//     *
-//     * THIS IS NOT RECOMMENDED as it by passes the spring boot's abstraction
-//     *
-//     * @param httpServletResponse
-//     * @throws IOException
-//     */
-//    @GetMapping(value="bio/buffered")
-//    public void getHugeFileBio1(HttpServletResponse httpServletResponse) throws IOException {
-//        int bufferByteSize = 1024; // Adjust buffer size as needed
-//        int bytesRead; // keeps track of no.of byte filled in the buffer
-//        byte[] buffer = new byte[bufferByteSize];
-//        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
-//            while ((bytesRead = bis.read(buffer)) != -1) {
-//                // Process the bytes in the buffer
-//                for (int i = 0; i < bytesRead; i++) {
-//                    httpServletResponse.getWriter().write(buffer[i]);
-//                    httpServletResponse.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=150MB.csv");
-//                }
-//            }
-//        }
-//        log.info("Download completed");
-//    }
 
     /**
      *
@@ -134,7 +90,7 @@ public class HugeFileController {
         HttpHeaders headers = new HttpHeaders();
 //        headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDisposition(ContentDisposition.attachment().filename("stream.csv").build());
-
+        headers.setContentLength(new File(filePath + fileName + "." + fileExtension).length());
         StreamingResponseBody stream = outputStream -> {
 
             int byteRead;

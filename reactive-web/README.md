@@ -4,10 +4,19 @@ This corresponds to the medium post [here](https://medium.com/p/ef95ca9f02b7/edi
 
 ## Run
 
-Run the following for JFR
+- Run the following for JFR,
 ```
--Dserver.port=8081
--XX:StartFlightRecording=duration=200s,filename=flight.jfr
+java -Dserver.port=8081 -XX:StartFlightRecording=duration=200s,filename=flight.jfr -jar .\target\reactive-web.jar
+```
+
+- Run with glowroot,
+```
+java -javaagent:C:\Users\suriy\main\Softwares\Installed\glowroot-0.14.2-dist\glowroot\glowroot.jar -jar .\target\reactive-web.jar
+```
+
+- With both,
+```
+java -javaagent:C:\Users\suriy\main\Softwares\Installed\glowroot-0.14.2-dist\glowroot\glowroot.jar -XX:StartFlightRecording=duration=60s,filename=flight.jfr -jar .\target\reactive-web.jar
 ```
 
 ## Load with Gatling
@@ -16,26 +25,29 @@ Run the following for JFR
 mvnw gatling:test
 ```
 
-## Load with K6 or ab
-
-Make sure k6 is installed (WSL) 
-
-**Note:** this runs only when java from WSL is used - you could not profile in IDEA since it does not see WSL java 
-
-```
-k6 run src/test/js/load.js
-```
-
-```
-ab http://localhost:8081/hugefile/bio/stream
-```
-
 ## How to test
+
+### Servlet Tomcat vs Reactor Netty
 
 - The project has client and server controller
 - Run the client at 8080 and server at 8081
 - Make the browser call to the client APIs - which inturn calls the server API
 - Comment the desired Web container (tomcat/netty) based on your testing to test the __bio__ and __nio__
+
+### Hugefile
+
+- Run the application with GLOWROOT, JFR
+- Run the gatling sim
+- Flip the **simulationClass** in the pom between *bio* and *nio* 
+- Check against /stream vs /nio call in the File IO and Socket IO - and check **Transaction** graph in **glowroot**
+
+#### Observation
+
+##### BIO stream
+
+- Inverted parallelism - more GC parallel thread waited for IO operation or CPU resulting. Refer [hugefile bio stream jfr](./docs/hugefile/hugefile-bio-stream-over-30-sec.jfr)
+- Method profiling - OutputStream buffer write lock, probably due to writing 1 byte at a time
+- The Read IO and Socket IO - could tell a little bit about how much is read at a particular snapshot - but it does not tell the whole pic since the profiler takes snapshots at certain time based on the config
 
 ## TODO: Enhancement from here
 
