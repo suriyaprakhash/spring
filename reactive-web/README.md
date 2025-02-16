@@ -10,6 +10,12 @@ Run the following for JFR
 -XX:StartFlightRecording=duration=200s,filename=flight.jfr
 ```
 
+## Load with Gatling
+
+```
+mvnw gatling:test
+```
+
 ## Load with K6 or ab
 
 Make sure k6 is installed (WSL) 

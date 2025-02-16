@@ -35,10 +35,16 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class HugeFileController {
 
+<<<<<<< HEAD
     String filePath = "/hugefile";
     String fileName = "hugefile";
     String fileExtension = ".hugefile";
     int bufferByteSize = 8192; // Adjust buffer size as needed
+=======
+    private String filePath = "\"/home/suriya/sample-test-files/\"";
+    private String fileName = "150MB";
+    private String fileType = "csv";
+>>>>>>> main
 
 //    /**
 //     * This does not work with just reactor Netty - since HttpServletResponse is from tomcat
