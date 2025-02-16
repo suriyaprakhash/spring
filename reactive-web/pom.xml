@@ -53,10 +53,10 @@
         </dependency>
 
         <!-- for bio tomcat web -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-web</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
         <!-- This is part of spring-boot-starter-webflux, however to test just the tomcat against the nio call use this for webclient, flux classes -->
         <!-- This does not bring the reactor netty server - can be commented while using starter-webflux -->
