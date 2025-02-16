@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -17,19 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,9 +35,15 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 public class HugeFileController {
 
-    private String filePath = "\"/home/suriya/sample-test-files/\"";
-    private String fileName = "150MB";
-    private String fileType = "csv";
+
+    String filePath = "/hugefile";
+    String fileName = "hugefile";
+    String fileExtension = ".hugefile";
+    int bufferByteSize = 8192; // Adjust buffer size as needed
+
+    // private String filePath = "\"/home/suriya/sample-test-files/\"";
+    // private String fileName = "150MB";
+    // private String fileType = "csv";
 
 //    /**
 //     * This does not work with just reactor Netty - since HttpServletResponse is from tomcat
@@ -100,7 +101,7 @@ public class HugeFileController {
     public ResponseEntity<Resource> getHugeFileBio2() throws IOException {
 
         try {
-            Path filePath = Paths.get("/home/suriya/sample-test-files/").resolve("150MB.csv").normalize();
+            Path filePath = Paths.get(this.filePath).resolve(fileName + "." + fileExtension).normalize();
             Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return ResponseEntity.ok().body(resource);
@@ -129,7 +130,6 @@ public class HugeFileController {
     public ResponseEntity<StreamingResponseBody> getHugeFileBioStream()  {
 //       DeferredResult<ResponseEntity<StreamingResponseBody>> deferredResult = new DeferredResult<>(10000L);
 
-        int bufferByteSize = 8192; // Adjust buffer size as needed - default 8192
 
         HttpHeaders headers = new HttpHeaders();
 //        headers.setContentType(MediaType.APPLICATION_PDF);
@@ -138,7 +138,8 @@ public class HugeFileController {
         StreamingResponseBody stream = outputStream -> {
 
             int byteRead;
-            try (var bis = new BufferedInputStream(new FileInputStream("/home/suriya/sample-test-files/150MB.csv"), bufferByteSize)) {
+            try (var bis = new BufferedInputStream(new FileInputStream(filePath + fileName + "." + fileExtension),
+                    bufferByteSize)) {
                 // gets only one byte so does more read from the stream
                 while ((byteRead = bis.read()) != -1) {
                     outputStream.write(byteRead);
@@ -273,14 +274,12 @@ public class HugeFileController {
      */
     @GetMapping(value="nio/write-block")
     public ResponseEntity<StreamingResponseBody> getHugeFileNioTomcat() {
-        int bufferByteSize = 8192; // Adjust buffer size as needed
-        String filePath = "/home/suriya/sample-test-files/150MB.csv";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.attachment().filename("nio.csv").build());
 
         StreamingResponseBody stream = outputStream -> {
-            Path nioPath = Paths.get(filePath);
+            Path nioPath = Paths.get(filePath + fileName + "." + fileExtension);
             ByteBuffer byteBuffer = ByteBuffer.allocate(bufferByteSize);
             // represents connection to the network
             try (FileChannel fileChannel = FileChannel.open(nioPath, StandardOpenOption.READ)) {
@@ -316,11 +315,11 @@ public class HugeFileController {
      */
     @GetMapping(value="nio", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<Flux<DataBuffer>> getHugeFileNio() {
-        int bufferByteSize = 8192; // Adjust buffer size as needed
-        String filePath = "/home/suriya/sample-test-files/150MB.csv";
+
         try {
             // represents connection to the network
-            AsynchronousFileChannel channel = AsynchronousFileChannel.open(Paths.get(filePath), StandardOpenOption.READ); // Use AsynchronousFileChannel
+            AsynchronousFileChannel channel = AsynchronousFileChannel.open(
+                    Paths.get(filePath + fileName + "." + fileExtension), StandardOpenOption.READ); // Use AsynchronousFileChannel
             DefaultDataBufferFactory dataBufferFactory = new DefaultDataBufferFactory();
 
             Flux<DataBuffer> dataBufferFlux =  Flux.create(sink -> {
