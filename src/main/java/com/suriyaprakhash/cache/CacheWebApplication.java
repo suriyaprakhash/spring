@@ -1,4 +1,4 @@
-package com.suriyaprakhash.learn.cache_web;
+package com.suriyaprakhash.cache;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

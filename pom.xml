@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.3</version>
+		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.suriyaprakhash</groupId>
-	<artifactId>cache-web</artifactId>
+	<artifactId>cache-inventory</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>cache-web</name>
 	<description>Demo project for Spring Boot</description>
@@ -59,6 +59,20 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- for swagger-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.5</version>
+		</dependency>
+
+		<!-- helps for UUID-7 generation-->
+		<dependency>
+			<groupId>com.fasterxml.uuid</groupId>
+			<artifactId>java-uuid-generator</artifactId>
+			<version>4.3.0</version>
+		</dependency>
+
 		<!-- for spring boot test-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -71,6 +85,11 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

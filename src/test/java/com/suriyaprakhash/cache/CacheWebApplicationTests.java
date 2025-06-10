@@ -1,4 +1,4 @@
-package com.suriyaprakhash.learn.cache_web;
+package com.suriyaprakhash.cache;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
